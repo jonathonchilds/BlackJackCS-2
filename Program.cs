@@ -10,7 +10,7 @@ namespace BlackJackCS
         static void Main(string[] args)
         {
 
-            // var playerHand = new List<string>() { deck[0], deck[1] };
+            var playerHand = new List<string>() { deck[0], deck[1] };
             // var computerHand = new List<string>() { deck[2], deck[3] };
 
             // Console.WriteLine($"You're holding {playerHand[0]} & {playerHand[1]}. Would you like to \"hit\" or \"stand\"?");
@@ -26,8 +26,8 @@ namespace BlackJackCS
             // }
 
         }
-
     }
+
     class Card
     {
         public string Suit { get; }
@@ -65,17 +65,21 @@ namespace BlackJackCS
         public void Shuffle()
         {
             var deckLength = Cards.Count;
-
             for (var rightIndex = deckLength - 1; rightIndex >= 1; rightIndex--)
             {
                 var randomNumberGenerator = new Random();
                 var leftIndex = randomNumberGenerator.Next(rightIndex);
-
                 var leftCard = Cards[leftIndex];
                 var rightCard = Cards[rightIndex];
                 Cards[rightIndex] = leftCard;
                 Cards[leftIndex] = rightCard;
             }
+        }
+        public Card Deal()
+        {
+            var newCard = Cards[0];
+            Cards.Remove(newCard);
+            return newCard;
         }
     }
 }
