@@ -4,30 +4,6 @@ using System.Collections.Generic;
 
 namespace BlackJackCS
 {
-    class Program
-    {
-
-        static void Main(string[] args)
-        {
-
-            var playerHand = new List<string>() { deck[0], deck[1] };
-            // var computerHand = new List<string>() { deck[2], deck[3] };
-
-            // Console.WriteLine($"You're holding {playerHand[0]} & {playerHand[1]}. Would you like to \"hit\" or \"stand\"?");
-
-            // var hitOrStand = Console.ReadLine();
-
-            // while (hitOrStand != "stand")
-            // {
-            //     for (var i = 4; i < playerHand.Count; i++)
-            //         playerHand.Add(deck[i]);
-            //     Console.WriteLine($"You're holding {playerHand}. Would you like to \"hit\" or \"stand\"?");
-            //     hitOrStand = Console.ReadLine();
-            // }
-
-        }
-    }
-
     class Card
     {
         public string Suit { get; }
@@ -38,6 +14,10 @@ namespace BlackJackCS
         {
             Suit = suit;
             Rank = rank;
+        }
+        public string CardFormat()
+        {
+            return $"{Rank} of {Suit}";
         }
 
     }
@@ -80,6 +60,55 @@ namespace BlackJackCS
             var newCard = Cards[0];
             Cards.Remove(newCard);
             return newCard;
+        }
+
+    }
+    class Program
+    {
+
+        static string DisplayHand(List<Card> hand)
+        {
+
+            var cardNames = "";
+            for (var i = 0; i < hand.Count; i++)
+            {
+                cardNames += hand[i].CardFormat();
+                if (i == hand.Count - 2)
+                {
+                    cardNames += " and ";
+                }
+                else if (i != hand.Count - 1)
+                {
+                    cardNames += ", ";
+                }
+            }
+            return cardNames;
+        }
+
+        static void Main(string[] args)
+        {
+
+            var deck = new Deck();
+
+            deck.Shuffle();
+
+            var playerHand = new List<Card>() { deck.Deal(), deck.Deal() };
+
+            var computerHand = new List<Card>() { deck.Deal(), deck.Deal() };
+
+
+
+            Console.WriteLine($"You're holding {DisplayHand(playerHand)}. Would you like to \"hit\" or \"stand\"?");
+
+            var hitOrStand = Console.ReadLine();
+
+            while (hitOrStand != "stand")
+            {
+                playerHand.Add(deck.Deal());
+                Console.WriteLine($"You're holding {DisplayHand(playerHand)}. Would you like to \"hit\" or \"stand\"?");
+                hitOrStand = Console.ReadLine();
+            }
+
         }
     }
 }
