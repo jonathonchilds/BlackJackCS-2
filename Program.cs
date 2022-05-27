@@ -8,108 +8,172 @@ namespace BlackJackCS
     {
         public string Suit { get; }
         public string Rank { get; }
-        public int Value { get; set; }
+        public int Value { get; }
 
         public Card(string suit, string rank)
         {
             Suit = suit;
             Rank = rank;
+            Value = CalculateValue();
         }
+
         public string CardFormat()
         {
             return $"{Rank} of {Suit}";
         }
 
-    }
-
-    class Deck
-    {
-        public List<Card> Cards { get; }
-
-        public Deck()
+        private int CalculateValue()
         {
-
-            var suits = new List<string>() { "Hearts", "Diamonds", "Spades", "Clubs" };
-            var ranks = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace" };
-            Cards = new List<Card>();
-
-            foreach (var suit in suits)
+            switch (Rank)
             {
-                foreach (var rank in ranks)
+                case "Jack":
+                case "Queen":
+                case "King":
+                    return 10;
+
+                case "Ace":
+                    return 11;
+
+                default:
+                    return int.Parse(Rank);
+            }
+        }
+
+        class Deck
+        {
+            public List<Card> Cards { get; }
+
+            public Deck()
+            {
+                var suits = new List<string>() { "Hearts", "Diamonds", "Spades", "Clubs" };
+                var ranks = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace" };
+
+                Cards = new List<Card>();
+
+                foreach (var suit in suits)
                 {
-                    var card = new Card(suit, rank);
-                    Cards.Add(card);
+                    foreach (var rank in ranks)
+                    {
+                        var card = new Card(suit, rank);
+                        Cards.Add(card);
+                    }
                 }
             }
-        }
-        public void Shuffle()
-        {
-            var deckLength = Cards.Count;
-            for (var rightIndex = deckLength - 1; rightIndex >= 1; rightIndex--)
+            public void Shuffle()
             {
-                var randomNumberGenerator = new Random();
-                var leftIndex = randomNumberGenerator.Next(rightIndex);
-                var leftCard = Cards[leftIndex];
-                var rightCard = Cards[rightIndex];
-                Cards[rightIndex] = leftCard;
-                Cards[leftIndex] = rightCard;
-            }
-        }
-        public Card Deal()
-        {
-            var newCard = Cards[0];
-            Cards.Remove(newCard);
-            return newCard;
-        }
-
-    }
-    class Program
-    {
-
-        static string DisplayHand(List<Card> hand)
-        {
-
-            var cardNames = "";
-            for (var i = 0; i < hand.Count; i++)
-            {
-                cardNames += hand[i].CardFormat();
-                if (i == hand.Count - 2)
+                var deckLength = Cards.Count;
+                for (var rightIndex = deckLength - 1; rightIndex >= 1; rightIndex--)
                 {
-                    cardNames += " and ";
-                }
-                else if (i != hand.Count - 1)
-                {
-                    cardNames += ", ";
+                    var randomNumberGenerator = new Random();
+                    var leftIndex = randomNumberGenerator.Next(rightIndex);
+                    var leftCard = Cards[leftIndex];
+                    var rightCard = Cards[rightIndex];
+                    Cards[rightIndex] = leftCard;
+                    Cards[leftIndex] = rightCard;
                 }
             }
-            return cardNames;
-        }
-
-        static void Main(string[] args)
-        {
-
-            var deck = new Deck();
-
-            deck.Shuffle();
-
-            var playerHand = new List<Card>() { deck.Deal(), deck.Deal() };
-
-            var computerHand = new List<Card>() { deck.Deal(), deck.Deal() };
-
-
-
-            Console.WriteLine($"You're holding {DisplayHand(playerHand)}. Would you like to \"hit\" or \"stand\"?");
-
-            var hitOrStand = Console.ReadLine();
-
-            while (hitOrStand != "stand")
+            public Card Deal()
             {
-                playerHand.Add(deck.Deal());
-                Console.WriteLine($"You're holding {DisplayHand(playerHand)}. Would you like to \"hit\" or \"stand\"?");
-                hitOrStand = Console.ReadLine();
+                var newCard = Cards[0];
+                Cards.Remove(newCard);
+                return newCard;
+            }
+        }
+        class Program
+        {
+            static string DisplayHand(List<Card> hand)
+            {
+                var cardNames = "";
+                for (var i = 0; i < hand.Count; i++)
+                {
+                    cardNames += hand[i].CardFormat();
+                    if (i == hand.Count - 2)
+                    {
+                        cardNames += " and ";
+                    }
+                    else if (i != hand.Count - 1)
+                    {
+                        cardNames += ", ";
+                    }
+                }
+                return cardNames;
             }
 
+            static int ScoreHand(List<Card> hand)
+            {
+                int cardTotal = 0;
+                for (var i = 0; i < hand.Count; i++)
+                {
+                    cardTotal += hand[i].Value;
+
+                }
+                return cardTotal;
+            }
+
+
+            static void Main(string[] args)
+            {
+                var deck = new Deck();
+                deck.Shuffle();
+
+                var playerHand = new List<Card>() { deck.Deal(), deck.Deal() };
+
+                var computerHand = new List<Card>() { deck.Deal(), deck.Deal() };
+
+                var hitOrStand = "";
+
+                // == 21 does not mean busted
+                // 
+
+                if (ScoreHand(playerHand) < 21)
+                {
+                    do
+                    {
+                        Console.WriteLine($"You're holding {DisplayHand(playerHand)}. Would you like to \"hit\" or \"stand\"?");
+                        hitOrStand = Console.ReadLine();
+                        if (hitOrStand == "hit")
+                        {
+                            playerHand.Add(deck.Deal());
+                        }
+                    }
+                    while (hitOrStand == "hit" && ScoreHand(playerHand) < 21);
+                }
+                if (ScoreHand(playerHand) == 21)
+                {
+                    Console.WriteLine($"Black Jack!");
+                }
+                else if (ScoreHand(playerHand) > 21)
+                {
+                    Console.WriteLine($"You're holding {DisplayHand(playerHand)}, totaling {ScoreHand(playerHand)}. You busted!");
+                    Environment.Exit(0);
+                }
+
+
+                Console.WriteLine($"You're holding {DisplayHand(playerHand)}, totaling {ScoreHand(playerHand)}");
+
+
+                while (ScoreHand(computerHand) < 17)
+                {
+                    computerHand.Add(deck.Deal());
+                }
+
+                var computerHandTotal = ScoreHand(computerHand);
+                var playerHandTotal = ScoreHand(playerHand);
+
+                Console.WriteLine($"The house is holding {DisplayHand(computerHand)}, totaling {ScoreHand(computerHand)}");
+
+                if (computerHandTotal < playerHandTotal)
+                {
+                    Console.WriteLine($"You win!");
+                }
+                else
+                {
+                    Console.WriteLine($"Computer wins!");
+                }
+            }
         }
     }
 }
+
+
 
