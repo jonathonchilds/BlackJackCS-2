@@ -129,7 +129,7 @@ namespace BlackJackCS
                 {
                     do
                     {
-                        Console.WriteLine($"You're holding {DisplayHand(playerHand)}. Would you like to \"hit\" or \"stand\"?");
+                        Console.WriteLine($"You're holding {DisplayHand(playerHand)}, totaling {ScoreHand(playerHand)}. Would you like to \"hit\" or \"stand\"?");
                         hitOrStand = Console.ReadLine();
                         if (hitOrStand == "hit")
                         {
@@ -140,11 +140,11 @@ namespace BlackJackCS
                 }
                 if (ScoreHand(playerHand) == 21)
                 {
-                    Console.WriteLine($"Black Jack!");
+                    Console.WriteLine($"You got Blackjack!");
                 }
                 else if (ScoreHand(playerHand) > 21)
                 {
-                    Console.WriteLine($"You're holding {DisplayHand(playerHand)}, totaling {ScoreHand(playerHand)}. You busted!");
+                    Console.WriteLine($"You're holding {DisplayHand(playerHand)}, totaling {ScoreHand(playerHand)}. You busted! Computer wins.");
                     Environment.Exit(0);
                 }
 
@@ -152,9 +152,19 @@ namespace BlackJackCS
                 Console.WriteLine($"You're holding {DisplayHand(playerHand)}, totaling {ScoreHand(playerHand)}");
 
 
-                while (ScoreHand(computerHand) < 17)
+                while (ScoreHand(computerHand) < 17 && ScoreHand(computerHand) < 22)
                 {
                     computerHand.Add(deck.Deal());
+                }
+
+                if (ScoreHand(computerHand) == 21)
+                {
+                    Console.WriteLine($"Computer gets Blackjack!");
+                }
+                else if (ScoreHand(computerHand) > 21)
+                {
+                    Console.WriteLine($"Computer is holding {ScoreHand(computerHand)}. Computer busted! You win!");
+                    Environment.Exit(0);
                 }
 
                 var computerHandTotal = ScoreHand(computerHand);
@@ -165,6 +175,11 @@ namespace BlackJackCS
                 if (computerHandTotal < playerHandTotal)
                 {
                     Console.WriteLine($"You win!");
+                }
+                else if (computerHandTotal == playerHandTotal)
+                {
+                    Console.WriteLine($"It's a tie. Computer wins!");
+
                 }
                 else
                 {
